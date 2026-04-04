@@ -39,9 +39,8 @@ if st.session_state.user is None:
 )
 
 menu = st.session_state.menu
-
-    # -------- SIGNUP --------
-    if menu == "Signup":
+# -------- SIGNUP -------- 
+if menu == "Signup":
         st.title("📝 Signup")
 
         new_email = st.text_input("Email")
