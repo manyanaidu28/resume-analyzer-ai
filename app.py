@@ -17,6 +17,9 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 # ---------------- SESSION ----------------
 if "user" not in st.session_state:
     st.session_state.user = None
+    # MENU STATE
+if "menu" not in st.session_state:
+    st.session_state.menu = "Signup"
 
 # ---------------- USER FILE ----------------
 if not os.path.exists("users.json"):
@@ -29,7 +32,13 @@ with open("users.json", "r") as f:
 # ---------------- AUTH SYSTEM ----------------
 if st.session_state.user is None:
 
-    menu = st.sidebar.radio("👤 Account", ["Signup", "Login"])
+    st.session_state.menu = st.sidebar.radio(
+    "Account",
+    ["Signup", "Login"],
+    index=0 if st.session_state.menu == "Signup" else 1
+)
+
+menu = st.session_state.menu
 
     # -------- SIGNUP --------
     if menu == "Signup":
@@ -48,7 +57,9 @@ if st.session_state.user is None:
                 with open("users.json", "w") as f:
                     json.dump(users, f)
 
-                st.success("Account created ✅ Now go to Login")
+                st.success("Account created ✅ Redirecting...")
+
+                st.session_state.menu = "Login"
                 st.rerun()
 
         st.stop()
