@@ -17,7 +17,7 @@ with open("users.json", "r") as f:
 # ---------------- AUTH SYSTEM ----------------
 if st.session_state.user is None:
 
-    menu = st.sidebar.radio("🔐 Account", ["Signup", "Login"])
+    menu = st.sidebar.radio("👤 Account", ["Signup", "Login"])
 
     # -------- SIGNUP --------
     if menu == "Signup":
@@ -30,7 +30,7 @@ if st.session_state.user is None:
             if new_email in users:
                 st.error("User already exists ❌")
             elif new_email == "" or new_password == "":
-                st.warning("Fill all fields ⚠️")
+                st.warning("Fill all fields ⚠")
             else:
                 users[new_email] = new_password
                 with open("users.json", "w") as f:
@@ -51,7 +51,7 @@ if st.session_state.user is None:
         if st.button("Login"):
             if email in users and users[email] == password:
                 st.session_state.user = email
-                st.success(f"Welcome {email} 🚀")
+                st.success(f"Welcome {email} 🎉")
                 st.rerun()
             else:
                 st.error("Invalid credentials ❌")
@@ -67,44 +67,45 @@ if st.session_state.user is not None:
         st.session_state.user = None
         st.rerun()
 
-    # APP UI
-        st.title("🚀 Resume Analyzer AI")
-        st.markdown("### Analyze your resume & improve your skills 💡")
+    # -------- APP UI --------
+    st.title("🚀 Resume Analyzer AI")
+    st.markdown("### Analyze your resume & improve your skills 💡")
 
-        skills = [
+    skills = [
         "python", "sql", "machine learning", "excel",
         "communication", "data analysis", "deep learning",
         "nlp", "power bi", "tableau"
-        ]
+    ]
 
-        uploaded_file = st.file_uploader("📄 Upload Resume (PDF or TXT)", type=["pdf", "txt"])
+    uploaded_file = st.file_uploader(
+        "📄 Upload Resume (PDF or TXT)", type=["pdf", "txt"]
+    )
 
-        resume = ""
+    resume = ""
 
-      if uploaded_file is not None:
-          
-          if uploaded_file.type == "application/pdf":
-           import PyPDF2
-           pdf_reader = PyPDF2.PdfReader(uploaded_file)
-          
-              for page in pdf_reader.pages:
+    # -------- READ FILE --------
+    if uploaded_file is not None:
+        if uploaded_file.type == "application/pdf":
+            import PyPDF2
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            for page in pdf_reader.pages:
                 text = page.extract_text()
                 if text:
-                resume += text
-     else:
-        resume = uploaded_file.read().decode("utf-8")
+                    resume += text
+        else:
+            resume = uploaded_file.read().decode("utf-8")
 
-      resume_input = st.text_area("📋 Or paste your resume here")
+    # -------- TEXT INPUT --------
+    resume_input = st.text_area("📋 Or paste your resume here")
 
-      if resume_input:
-      resume = resume_input
+    if resume_input:
+        resume = resume_input
 
-      if st.button("🔍 Analyze Resume"):    
-
-          if resume.strip() == "":
-            st.warning("⚠️ Please upload or paste resume")
-         
-          else:
+    # -------- ANALYZE --------
+    if st.button("🔍 Analyze Resume"):
+        if resume.strip() == "":
+            st.warning("⚠ Please upload or paste resume")
+        else:
             resume = resume.lower()
 
             found_skills = [s for s in skills if s in resume]
@@ -119,29 +120,28 @@ if st.session_state.user is not None:
 
             st.progress(score)
 
-      # -------- FEEDBACK --------
-      feedback = f"""
-     🔥 Resume Feedback:
+            # -------- FEEDBACK --------
+            feedback = f"""
+🔥 Resume Feedback:
 
 - You have {len(found_skills)} important skills.
 - Improve by adding: {', '.join(missing_skills[:3])}
 - Try adding projects, internships, and certifications.
 """
+            st.info(feedback)
 
-        st.info(feedback)
+            # -------- HISTORY --------
+            if "history" not in st.session_state:
+                st.session_state.history = []
 
-        # -------- HISTORY --------
-        if "history" not in st.session_state:
-            st.session_state.history = []
+            st.session_state.history.append({
+                "score": score,
+                "skills": found_skills
+            })
 
-        st.session_state.history.append({
-            "score": score,
-            "skills": found_skills
-        })
+    # -------- HISTORY DISPLAY --------
+    st.sidebar.subheader("📜 Your History")
 
-# -------- HISTORY DISPLAY --------
-st.sidebar.subheader("📜 Your History")
-
-if "history" in st.session_state:
-    for i, item in enumerate(st.session_state.history):
-        st.sidebar.write(f"{i+1}. Score: {item['score']}%")
+    if "history" in st.session_state:
+        for i, item in enumerate(st.session_state.history):
+            st.sidebar.write(f"{i+1}. Score: {item['score']}%")
