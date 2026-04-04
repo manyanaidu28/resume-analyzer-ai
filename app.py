@@ -27,7 +27,7 @@ with open("users.json", "r") as f:
 # ------------------ SIGNUP ------------------
 if menu == "Signup":
     st.title("📝 Signup")
-    
+
     new_email = st.text_input("Email")
     new_password = st.text_input("Password", type="password")
 
@@ -42,12 +42,13 @@ if menu == "Signup":
                 json.dump(users, f)
 
             st.success("Account created ✅ Now go to Login")
-st.session_state.user = None
-st.session_state.menu = "Login"
-st.rerun()
-# ------------------ LOGIN ------------------
-elif menu == "Login":
 
+            st.session_state.user = None
+            st.session_state.menu = "Login"
+            st.rerun()
+
+# ✅ THIS MUST BE SAME LEVEL (not inside)
+elif menu == "Login":
     if st.session_state.user is None:
         st.title("🔐 Login")
 
@@ -62,8 +63,7 @@ elif menu == "Login":
             else:
                 st.error("Invalid credentials ❌")
 
-        st.stop()
-
+    st.stop()
 # ------------------ AFTER LOGIN ------------------
 st.sidebar.success(f"👤 Logged in as: {st.session_state.user}")
 
