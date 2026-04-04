@@ -1,6 +1,18 @@
 import streamlit as st
 import json
 import os
+import streamlit as st
+
+# HIDE STREAMLIT MENU & SHARE BUTTON
+hide_st_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stDeployButton {display:none;}
+    </style>
+"""
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # ---------------- SESSION ----------------
 if "user" not in st.session_state:
