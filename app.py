@@ -60,25 +60,26 @@ if st.session_state.user is None:
 
 # ---------------- AFTER LOGIN ----------------
 if st.session_state.user is not None:
+
     st.sidebar.success(f"👤 Logged in as: {st.session_state.user}")
 
     if st.sidebar.button("Logout"):
         st.session_state.user = None
         st.rerun()
 
-     # ---------------- APP UI ----------------
-     st.title("🚀 Resume Analyzer AI")
-     st.markdown("### Analyze your resume & improve your skills 💡")
+    # APP UI
+        st.title("🚀 Resume Analyzer AI")
+        st.markdown("### Analyze your resume & improve your skills 💡")
 
-      skills = [
+        skills = [
         "python", "sql", "machine learning", "excel",
         "communication", "data analysis", "deep learning",
         "nlp", "power bi", "tableau"
-      ]
+        ]
 
-      uploaded_file = st.file_uploader("📄 Upload Resume (PDF or TXT)", type=["pdf", "txt"])
+        uploaded_file = st.file_uploader("📄 Upload Resume (PDF or TXT)", type=["pdf", "txt"])
 
-      resume = ""
+        resume = ""
 
       if uploaded_file is not None:
           
