@@ -67,9 +67,9 @@ if st.session_state.user is not None:
        st.session_state.user = None
        st.rerun()
 
-    # ---------------- APP UI ----------------
-      st.title("🚀 Resume Analyzer AI")
-      st.markdown("### Analyze your resume & improve your skills 💡")
+     # ---------------- APP UI ----------------
+     st.title("🚀 Resume Analyzer AI")
+     st.markdown("### Analyze your resume & improve your skills 💡")
 
       skills = [
         "python", "sql", "machine learning", "excel",
