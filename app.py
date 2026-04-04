@@ -1,58 +1,86 @@
 import streamlit as st
-import pandas as pd
-# ---------------- LOGIN SYSTEM ----------------
+import json
+import os
+
+# ------------------ SESSION ------------------
 if "user" not in st.session_state:
     st.session_state.user = None
 
-# Demo users
-users = {
-    "admin@gmail.com": "1234",
-    "user@gmail.com": "1234"
-}
+# ------------------ MENU ------------------
+menu = st.sidebar.radio("🔐 Account", ["Signup", "Login"])
 
-if st.session_state.user is None:
-    st.title("🔐 Login")
+# ------------------ USER FILE ------------------
+if not os.path.exists("users.json"):
+    with open("users.json", "w") as f:
+        json.dump({}, f)
 
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+with open("users.json", "r") as f:
+    users = json.load(f)
 
-    if st.button("Login"):
-        if email in users and users[email] == password:
-            st.session_state.user = email
-            st.success(f"Welcome {email} 🚀")
-            st.rerun()
+# ------------------ SIGNUP ------------------
+if menu == "Signup":
+    st.title("📝 Signup")
+
+    new_email = st.text_input("Email")
+    new_password = st.text_input("Password", type="password")
+
+    if st.button("Create Account"):
+        if new_email in users:
+            st.error("User already exists ❌")
+        elif new_email == "" or new_password == "":
+            st.warning("Fill all fields ⚠️")
         else:
-            st.error("Invalid credentials ❌")
+            users[new_email] = new_password
+            with open("users.json", "w") as f:
+                json.dump(users, f)
 
-    st.stop()
-    # ---------------- SIDEBAR ----------------
+            st.success("Account created ✅ Now go to Login")
+
+# ------------------ LOGIN ------------------
+elif menu == "Login":
+
+    if st.session_state.user is None:
+        st.title("🔐 Login")
+
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            if email in users and users[email] == password:
+                st.session_state.user = email
+                st.success(f"Welcome {email} 🚀")
+                st.rerun()
+            else:
+                st.error("Invalid credentials ❌")
+
+        st.stop()
+
+# ------------------ AFTER LOGIN ------------------
 st.sidebar.success(f"👤 Logged in as: {st.session_state.user}")
 
 if st.sidebar.button("Logout"):
     st.session_state.user = None
     st.rerun()
 
-# ---------------- HISTORY INIT ----------------
+# ------------------ HISTORY ------------------
 if "history" not in st.session_state:
     st.session_state.history = {}
 
-# ---------------- TITLE ----------------
+# ------------------ UI ------------------
 st.title("🚀 Resume Analyzer AI")
 st.markdown("### Analyze your resume & improve your skills 💡")
 
-# ---------------- SKILLS ----------------
 skills = [
     "python", "sql", "machine learning", "excel",
     "communication", "data analysis", "deep learning",
     "nlp", "power bi", "tableau"
 ]
 
-# ---------------- FILE UPLOAD ----------------
-uploaded_file = st.file_uploader("📂 Upload Resume (PDF or TXT)", type=["pdf", "txt"])
+# ------------------ FILE UPLOAD ------------------
+uploaded_file = st.file_uploader("📄 Upload Resume (PDF or TXT)", type=["pdf", "txt"])
 
 resume = ""
 
-# ---------------- READ FILE ----------------
 if uploaded_file is not None:
     if uploaded_file.type == "application/pdf":
         import PyPDF2
@@ -64,13 +92,13 @@ if uploaded_file is not None:
     else:
         resume = uploaded_file.read().decode("utf-8")
 
-# ---------------- TEXT INPUT ----------------
-resume_input = st.text_area("📄 Or paste your resume here")
+# ------------------ TEXT INPUT ------------------
+resume_input = st.text_area("📌 Or paste your resume here")
 
 if resume_input:
     resume = resume_input
 
-# ---------------- ANALYZE ----------------
+# ------------------ ANALYZE ------------------
 if st.button("🔍 Analyze Resume"):
 
     if resume.strip() == "":
@@ -83,15 +111,24 @@ if st.button("🔍 Analyze Resume"):
 
         score = int((len(found_skills) / len(skills)) * 100) if skills else 0
 
-        # ---------------- RESULTS ----------------
         st.subheader("📊 Results")
         st.write(f"✅ Found Skills: {', '.join(found_skills) if found_skills else 'None'}")
         st.write(f"❌ Missing Skills: {', '.join(missing_skills) if missing_skills else 'None'}")
-        st.write(f"📈 Score: {score}%")
+        st.write(f"🎯 Score: {score}%")
 
         st.progress(score)
 
-        # ---------------- SAVE HISTORY ----------------
+        # -------- AI FEEDBACK --------
+        feedback = f"""
+        🔥 Resume Feedback:
+        - You have {len(found_skills)} important skills.
+        - Improve by adding: {', '.join(missing_skills[:3])}
+        - Try adding projects, internships, and certifications.
+        """
+
+        st.info(feedback)
+
+        # -------- SAVE HISTORY --------
         user = st.session_state.user
 
         if user not in st.session_state.history:
@@ -101,7 +138,8 @@ if st.button("🔍 Analyze Resume"):
             "score": score,
             "skills": found_skills
         })
-# ---------------- SHOW HISTORY ----------------
+
+# ------------------ SHOW HISTORY ------------------
 st.sidebar.subheader("📜 Your History")
 
 user = st.session_state.user
