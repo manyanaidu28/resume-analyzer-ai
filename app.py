@@ -29,8 +29,7 @@ if not os.path.exists("users.json"):
 with open("users.json", "r") as f:
     users = json.load(f)
 
-# AUTH SYSTEM
-menu = st.sidebar.radio("👤 Account", ["Signup", "Login"])
+# ----------- AUTH SYSTEM -----------
 
 # ---------- SIGNUP ----------
 if menu == "Signup":
@@ -49,10 +48,18 @@ if menu == "Signup":
             with open("users.json", "w") as f:
                 json.dump(users, f)
 
-            st.success("Account created ✅ Please login")
+            st.success("Account created ✅ Redirecting to Login...")
+
+            st.session_state.menu = "Login"
+            st.rerun()
+
+    if st.button("Already have an account? Login"):
+        st.session_state.menu = "Login"
+        st.rerun()
+
 
 # ---------- LOGIN ----------
-if menu == "Login":
+elif menu == "Login":
     st.title("🔐 Login")
 
     email = st.text_input("Email")
@@ -64,6 +71,10 @@ if menu == "Login":
             st.success(f"Welcome {email} 🚀")
         else:
             st.error("Invalid credentials ❌")
+
+    if st.button("Create new account"):
+        st.session_state.menu = "Signup"
+        st.rerun()
 
         st.stop()
 
