@@ -30,7 +30,7 @@ with open("users.json", "r") as f:
     users = json.load(f)
 
 # ----------- AUTH SYSTEM -----------
-
+menu = st.session_state.menu
 # ---------- SIGNUP ----------
 if menu == "Signup":
     st.title("📝 Signup")
