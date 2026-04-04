@@ -42,10 +42,10 @@ if menu == "Signup":
                 json.dump(users, f)
 
             st.success("Account created ✅ Now go to Login")
-
-            st.session_state.user = None
             st.session_state.menu = "Login"
             st.rerun()
+
+    st.stop()
 
 # ✅ THIS MUST BE SAME LEVEL (not inside)
 elif menu == "Login":
