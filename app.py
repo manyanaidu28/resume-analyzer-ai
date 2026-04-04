@@ -60,12 +60,11 @@ if st.session_state.user is None:
 
 # ---------------- AFTER LOGIN ----------------
 if st.session_state.user is not None:
-
     st.sidebar.success(f"👤 Logged in as: {st.session_state.user}")
 
     if st.sidebar.button("Logout"):
-       st.session_state.user = None
-       st.rerun()
+        st.session_state.user = None
+        st.rerun()
 
      # ---------------- APP UI ----------------
      st.title("🚀 Resume Analyzer AI")
