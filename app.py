@@ -29,54 +29,41 @@ if not os.path.exists("users.json"):
 with open("users.json", "r") as f:
     users = json.load(f)
 
-# ---------------- AUTH SYSTEM ----------------
-if st.session_state.user is None:
+# AUTH SYSTEM
+menu = st.sidebar.radio("👤 Account", ["Signup", "Login"])
 
-    st.session_state.menu = st.sidebar.radio(
-    "Account",
-    ["Signup", "Login"],
-    index=0 if st.session_state.menu == "Signup" else 1
-)
-
-menu = st.session_state.menu
-# -------- SIGNUP -------- 
+# ---------- SIGNUP ----------
 if menu == "Signup":
-        st.title("📝 Signup")
+    st.title("📝 Signup")
 
-        new_email = st.text_input("Email")
-        new_password = st.text_input("Password", type="password")
+    new_email = st.text_input("Email")
+    new_password = st.text_input("Password", type="password")
 
-        if st.button("Create Account"):
-            if new_email in users:
-                st.error("User already exists ❌")
-            elif new_email == "" or new_password == "":
-                st.warning("Fill all fields ⚠")
-            else:
-                users[new_email] = new_password
-                with open("users.json", "w") as f:
-                    json.dump(users, f)
+    if st.button("Create Account"):
+        if new_email in users:
+            st.error("User already exists ❌")
+        elif new_email == "" or new_password == "":
+            st.warning("Fill all fields ⚠️")
+        else:
+            users[new_email] = new_password
+            with open("users.json", "w") as f:
+                json.dump(users, f)
 
-                st.success("Account created ✅ Redirecting...")
+            st.success("Account created ✅ Please login")
 
-                st.session_state.menu = "Login"
-                st.rerun()
+# ---------- LOGIN ----------
+if menu == "Login":
+    st.title("🔐 Login")
 
-        st.stop()
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
 
-    # -------- LOGIN --------
-    if menu == "Login":
-        st.title("🔐 Login")
-
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
-
-        if st.button("Login"):
-            if email in users and users[email] == password:
-                st.session_state.user = email
-                st.success(f"Welcome {email} 🎉")
-                st.rerun()
-            else:
-                st.error("Invalid credentials ❌")
+    if st.button("Login"):
+        if email in users and users[email] == password:
+            st.session_state.user = email
+            st.success(f"Welcome {email} 🚀")
+        else:
+            st.error("Invalid credentials ❌")
 
         st.stop()
 
