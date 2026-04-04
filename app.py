@@ -7,7 +7,14 @@ if "user" not in st.session_state:
     st.session_state.user = None
 
 # ------------------ MENU ------------------
-menu = st.sidebar.radio("🔐 Account", ["Signup", "Login"])
+if "menu" not in st.session_state:
+    st.session_state.menu = "Signup"
+
+menu = st.sidebar.radio(
+    "🔐 Account",
+    ["Signup", "Login"],
+    index=0 if st.session_state.menu == "Signup" else 1
+)
 
 # ------------------ USER FILE ------------------
 if not os.path.exists("users.json"):
@@ -20,7 +27,7 @@ with open("users.json", "r") as f:
 # ------------------ SIGNUP ------------------
 if menu == "Signup":
     st.title("📝 Signup")
-
+    
     new_email = st.text_input("Email")
     new_password = st.text_input("Password", type="password")
 
@@ -35,7 +42,9 @@ if menu == "Signup":
                 json.dump(users, f)
 
             st.success("Account created ✅ Now go to Login")
-
+st.session_state.user = None
+st.session_state.menu = "Login"
+st.rerun()
 # ------------------ LOGIN ------------------
 elif menu == "Login":
 
