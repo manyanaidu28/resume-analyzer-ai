@@ -13,10 +13,14 @@ This is an AI-based Resume Analyzer that checks your skills and suggests improve
 - Google Colab
 
 ## 🔹 Output Example
-- Resume Score: 50%
-- Missing Skills: SQL, Machine Learning, Data Analysis
-
+- Detected Skills: Python, Excel, Communication  
+- Missing Skills: SQL, Machine Learning, Data Analysis  
+- Resume Score: 50%  
+- Suggestion: Try learning SQL, Machine Learning, Data Analysis
 ## 🔹 Future Improvements
 - PDF Resume Upload
 - Web Interface
 - Advanced AI (NLP)
+  
+## 🎯 Goal
+To help students identify missing skills and improve their resumes using simple AI logic.
