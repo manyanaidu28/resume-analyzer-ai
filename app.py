@@ -18,17 +18,17 @@ st.set_page_config(
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-
 if "users" not in st.session_state:
     st.session_state.users = {}
 
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "section" not in st.session_state:
+    st.session_state.section = "home"
+
 # =========================================================
-# CUSTOM CSS
+# CSS
 # =========================================================
 
 st.markdown("""
@@ -60,96 +60,87 @@ footer {
     color: white;
 }
 
-/* Typography */
+/* Fonts */
 
 html, body, [class*="css"] {
     font-family: 'Poppins', sans-serif;
+}
+
+/* Inputs */
+
+.stTextInput input {
+    background-color: #1e293b !important;
+    color: white !important;
+    border-radius: 14px !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Upload */
+
+.stFileUploader {
+    background-color: #1e293b;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #334155;
 }
 
 /* 3D Buttons */
 
 .stButton > button {
 
+    width: 100%;
+
     background: linear-gradient(
         135deg,
-        #4f46e5,
+        #3b82f6,
         #9333ea
     );
 
     color: white;
+
     border: none;
+
+    padding: 16px;
+
     border-radius: 18px;
-    padding: 14px 24px;
+
     font-size: 20px;
+
     font-weight: bold;
 
+    margin-top: 12px;
+
     box-shadow:
-        0px 8px 20px rgba(0,0,0,0.35);
+        0 8px 20px rgba(0,0,0,0.4);
 
-    transition:
-        all 0.3s ease-in-out;
-
-    width: 100%;
+    transition: 0.3s;
 }
 
 .stButton > button:hover {
 
-    transform:
-        translateY(-4px)
-        scale(1.03);
+    transform: scale(1.03);
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #7e22ce
+    );
 
     box-shadow:
-        0px 12px 25px rgba(0,0,0,0.45);
-
-    background:
-        linear-gradient(
-            135deg,
-            #6366f1,
-            #a855f7
-        );
-}
-
-.stButton > button:active {
-
-    transform: scale(0.96);
-}
-
-/* Input Fields */
-
-.stTextInput input {
-
-    background-color: #1e293b !important;
-    color: white !important;
-
-    border-radius: 14px !important;
-
-    border: 1px solid #334155 !important;
-}
-
-/* Upload Box */
-
-.stFileUploader {
-
-    background-color: #1e293b;
-
-    padding: 20px;
-
-    border-radius: 16px;
-
-    border: 1px solid #334155;
+        0 10px 25px rgba(147,51,234,0.6);
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# WELCOME PAGE
+# WELCOME SCREEN
 # =========================================================
 
 if st.session_state.page == "welcome":
 
     st.markdown("""
-    <div style='text-align:center; padding-top:70px;'>
+    <div style='text-align:center; padding-top:60px;'>
 
     <h1 style='font-size:70px; color:white;'>
     🚀 Resume Analyzer AI
@@ -166,7 +157,6 @@ if st.session_state.page == "welcome":
     """, unsafe_allow_html=True)
 
     st.write("")
-    st.write("")
 
     st.markdown("""
     ### ✨ Features
@@ -177,18 +167,13 @@ if st.session_state.page == "welcome":
     ✅ Career Recommendations  
     ✅ Resume Improvement Tips  
     ✅ PDF Report Download  
-    ✅ AI Suggestions  
     ✅ Resume History  
     """)
 
     st.write("")
     st.write("")
-    st.write("")
 
-    if st.button(
-        "🚀 Get Started",
-        use_container_width=True
-    ):
+    if st.button("🚀 Get Started"):
 
         st.session_state.page = "signup"
 
@@ -223,23 +208,13 @@ elif st.session_state.page == "signup":
 
             st.session_state.users[email] = password
 
-            st.success(
-                "Account created successfully ✅"
-            )
+            st.success("Account created successfully ✅")
 
             time.sleep(1)
 
             st.session_state.page = "login"
 
             st.rerun()
-
-    st.write("")
-
-    if st.button("🔑 Already Have Account?"):
-
-        st.session_state.page = "login"
-
-        st.rerun()
 
 # =========================================================
 # LOGIN PAGE
@@ -256,7 +231,7 @@ elif st.session_state.page == "login":
         type="password"
     )
 
-    if st.button("🚀 Login"):
+    if st.button("🔑 Login"):
 
         if (
             login_email in st.session_state.users
@@ -267,8 +242,6 @@ elif st.session_state.page == "login":
 
             st.success("Login Successful ✅")
 
-            st.session_state.logged_in = True
-
             st.session_state.page = "loading"
 
             st.rerun()
@@ -278,7 +251,7 @@ elif st.session_state.page == "login":
             st.error("Invalid Email or Password ❌")
 
 # =========================================================
-# AI LOADING PAGE
+# AI LOADING SCREEN
 # =========================================================
 
 elif st.session_state.page == "loading":
@@ -309,69 +282,70 @@ elif st.session_state.page == "loading":
 
 elif st.session_state.page == "dashboard":
 
-    st.title("🚀 Dashboard")
+    st.markdown("""
+    <h1 style='text-align:center; color:white; font-size:60px;'>
+    🚀 Dashboard
+    </h1>
+    """, unsafe_allow_html=True)
 
-    page = st.radio(
-    "Choose Section",
-    [
-        "🏠 Home",
-        "📄 Upload Resume",
-        "⚡ Resume Processing",
-        "📊 ATS Results",
-        "🧠 Skills Analysis",
-        "❌ Missing Skills",
-        "💡 AI Suggestions",
-        "💼 Career Recommendations",
-        "📜 Resume Tips",
-        "📥 Download PDF Report",
-        "🕘 Resume History",
-        "👤 Profile"
-    ]
-)
+    # MENU BUTTONS
 
-st.write("")
+    if st.button("🏠 Home"):
+        st.session_state.section = "home"
 
-if st.button("🚪 Logout"):
+    if st.button("📄 Upload Resume"):
+        st.session_state.section = "upload"
 
-    st.session_state.logged_in = False
+    if st.button("⚡ Resume Processing"):
+        st.session_state.section = "processing"
 
-    st.session_state.page = "welcome"
+    if st.button("📊 ATS Results"):
+        st.session_state.section = "ats"
 
-    st.rerun()
+    if st.button("🧠 Skills Analysis"):
+        st.session_state.section = "skills"
+
+    if st.button("❌ Missing Skills"):
+        st.session_state.section = "missing"
+
+    if st.button("💡 AI Suggestions"):
+        st.session_state.section = "suggestions"
+
+    if st.button("💼 Career Recommendations"):
+        st.session_state.section = "career"
+
+    if st.button("📜 Resume Tips"):
+        st.session_state.section = "tips"
+
+    if st.button("📥 Download PDF Report"):
+        st.session_state.section = "download"
+
+    if st.button("🕘 Resume History"):
+        st.session_state.section = "history"
+
+    if st.button("👤 Profile"):
+        st.session_state.section = "profile"
+
+    if st.button("🚪 Logout"):
+
+        st.session_state.page = "welcome"
+
+        st.rerun()
+
+    st.write("")
+    st.write("")
 
     # =====================================================
     # HOME
     # =====================================================
 
-    if page == "🏠 Home":
+    if st.session_state.section == "home":
 
-        st.markdown("""
-        <div style='text-align:center;'>
+        st.title("🏠 Home")
 
-        <h1 style='font-size:60px;'>
-        🚀 Resume Analyzer AI
-        </h1>
+        st.metric("📄 Resume Checks", "120+")
 
-        <p style='font-size:25px; color:#d1d5db;'>
-
-        Welcome to your AI Dashboard 🔥
-
-        </p>
-
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.write("")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.metric("📄 Resume Checks", "120+")
-
-        with col2:
-            st.metric("🤖 AI Accuracy", "95%")
-
-        st.write("")
+        st.metric("🤖 AI Accuracy", "95%")
 
         st.metric("🚀 ATS Success", "90%")
 
@@ -379,34 +353,32 @@ if st.button("🚪 Logout"):
     # UPLOAD RESUME
     # =====================================================
 
-    elif page == "📄 Upload Resume":
+    elif st.session_state.section == "upload":
 
         st.title("📄 Upload Resume")
 
         uploaded_file = st.file_uploader(
-            "Upload your resume",
+            "Upload Resume PDF",
             type=["pdf"]
         )
 
         if uploaded_file:
 
-            st.success(
-                "Resume uploaded successfully ✅"
-            )
+            st.success("Resume uploaded successfully ✅")
 
             st.session_state.history.append(
                 uploaded_file.name
             )
 
     # =====================================================
-    # PROCESSING
+    # AI PROCESSING
     # =====================================================
 
-    elif page == "⚡ Resume Processing":
+    elif st.session_state.section == "processing":
 
         st.title("⚡ Resume Processing")
 
-        st.info("AI is processing your resume...")
+        st.info("AI is analyzing your resume...")
 
         progress = st.progress(0)
 
@@ -416,31 +388,27 @@ if st.button("🚪 Logout"):
 
             progress.progress(i + 1)
 
-        st.success(
-            "Resume processed successfully 🚀"
-        )
+        st.success("Resume processed successfully 🚀")
 
     # =====================================================
     # ATS RESULTS
     # =====================================================
 
-    elif page == "📊 ATS Results":
+    elif st.session_state.section == "ats":
 
         st.title("📊 ATS Results")
 
-        st.metric("🚀 ATS Score", "88%")
+        st.metric("🚀 ATS Score", "92%")
 
-        st.progress(88)
+        st.progress(92)
 
-        st.success(
-            "Your resume is ATS Friendly ✅"
-        )
+        st.success("Your resume is ATS Friendly ✅")
 
     # =====================================================
     # SKILLS ANALYSIS
     # =====================================================
 
-    elif page == "🧠 Skills Analysis":
+    elif st.session_state.section == "skills":
 
         st.title("🧠 Skills Analysis")
 
@@ -449,34 +417,35 @@ if st.button("🚪 Logout"):
 ✅ SQL  
 ✅ Communication  
 ✅ Teamwork  
-✅ Leadership  
+✅ Machine Learning  
 """)
 
     # =====================================================
     # MISSING SKILLS
     # =====================================================
 
-    elif page == "❌ Missing Skills":
+    elif st.session_state.section == "missing":
 
         st.title("❌ Missing Skills")
 
         st.warning("""
-⚠️ Machine Learning  
-⚠️ Cloud Computing  
+⚠️ Docker  
+⚠️ AWS  
+⚠️ System Design  
 ⚠️ Data Structures  
-⚠️ GitHub Projects  
 """)
 
     # =====================================================
     # AI SUGGESTIONS
     # =====================================================
 
-    elif page == "💡 AI Suggestions":
+    elif st.session_state.section == "suggestions":
 
         st.title("💡 AI Suggestions")
 
         st.info("""
 🔥 Add more projects  
+🔥 Add internships  
 🔥 Add certifications  
 🔥 Improve ATS keywords  
 🔥 Improve formatting  
@@ -486,7 +455,7 @@ if st.button("🚪 Logout"):
     # CAREER RECOMMENDATIONS
     # =====================================================
 
-    elif page == "💼 Career Recommendations":
+    elif st.session_state.section == "career":
 
         st.title("💼 Career Recommendations")
 
@@ -501,29 +470,29 @@ if st.button("🚪 Logout"):
     # RESUME TIPS
     # =====================================================
 
-    elif page == "📜 Resume Tips":
+    elif st.session_state.section == "tips":
 
         st.title("📜 Resume Tips")
 
         st.info("""
 ✅ Keep resume one page  
-✅ Add internships  
-✅ Add achievements  
-✅ Use action words  
+✅ Add measurable achievements  
+✅ Use ATS keywords  
+✅ Use professional formatting  
 """)
 
     # =====================================================
     # DOWNLOAD REPORT
     # =====================================================
 
-    elif page == "📥 Download PDF Report":
+    elif st.session_state.section == "download":
 
         st.title("📥 Download PDF Report")
 
         report = """
 Resume Analyzer AI Report
 
-ATS Score: 88%
+ATS Score: 92%
 
 Skills:
 - Python
@@ -545,13 +514,13 @@ Suggestions:
     # HISTORY
     # =====================================================
 
-    elif page == "🕘 Resume History":
+    elif st.session_state.section == "history":
 
         st.title("🕘 Resume History")
 
         if len(st.session_state.history) == 0:
 
-            st.warning("No resumes uploaded ⚠️")
+            st.warning("No resumes uploaded yet ⚠️")
 
         else:
 
@@ -563,13 +532,13 @@ Suggestions:
     # PROFILE
     # =====================================================
 
-    elif page == "👤 Profile":
+    elif st.session_state.section == "profile":
 
         st.title("👤 Profile")
 
         st.info("""
 👤 Resume Analyzer User  
-📧 Email Registered  
-🚀 Premium Dashboard  
-🤖 AI Enabled Account  
+📧 Registered Account  
+🚀 AI Dashboard Access  
+🤖 Premium Features Enabled  
 """)
