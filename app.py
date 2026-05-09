@@ -309,33 +309,35 @@ elif st.session_state.page == "loading":
 
 elif st.session_state.page == "dashboard":
 
-    st.sidebar.title("🚀 Dashboard")
+    st.title("🚀 Dashboard")
 
-    page = st.sidebar.radio(
-        "Navigation",
-        [
-            "🏠 Home",
-            "📄 Upload Resume",
-            "⚡ Resume Processing",
-            "📊 ATS Results",
-            "🧠 Skills Analysis",
-            "❌ Missing Skills",
-            "💡 AI Suggestions",
-            "💼 Career Recommendations",
-            "📜 Resume Tips",
-            "📥 Download PDF Report",
-            "🕘 Resume History",
-            "👤 Profile"
-        ]
-    )
+    page = st.radio(
+    "Choose Section",
+    [
+        "🏠 Home",
+        "📄 Upload Resume",
+        "⚡ Resume Processing",
+        "📊 ATS Results",
+        "🧠 Skills Analysis",
+        "❌ Missing Skills",
+        "💡 AI Suggestions",
+        "💼 Career Recommendations",
+        "📜 Resume Tips",
+        "📥 Download PDF Report",
+        "🕘 Resume History",
+        "👤 Profile"
+    ]
+)
 
-    if st.sidebar.button("🚪 Logout"):
+st.write("")
 
-        st.session_state.logged_in = False
+if st.button("🚪 Logout"):
 
-        st.session_state.page = "welcome"
+    st.session_state.logged_in = False
 
-        st.rerun()
+    st.session_state.page = "welcome"
+
+    st.rerun()
 
     # =====================================================
     # HOME
