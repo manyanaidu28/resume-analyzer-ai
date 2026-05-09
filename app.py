@@ -19,7 +19,7 @@ st.set_page_config(
 # GET API KEY:
 # https://aistudio.google.com/app/apikey
 
-GEMINI_API_KEY = "PASTE_YOUR_API_KEY"
+GEMINI_API_KEY = "AIzaSyCLjJNL1dT256Wf_d1gfiVQrlMusaaTb-A"
 
 genai.configure(api_key=GEMINI_API_KEY)
 
