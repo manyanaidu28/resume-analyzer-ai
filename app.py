@@ -3,14 +3,13 @@ import google.generativeai as genai
 from PyPDF2 import PdfReader
 from fpdf import FPDF
 from datetime import datetime
-import os
 
 # ---------------- PAGE CONFIG ----------------
 
 st.set_page_config(
     page_title="Resume Analyzer AI",
     page_icon="🚀",
-    layout="wide"
+    layout="centered"
 )
 
 # ---------------- GEMINI API ----------------
@@ -37,18 +36,9 @@ if "history" not in st.session_state:
 st.markdown("""
 <style>
 
-html, body, [class*="css"] {
-    font-family: 'Poppins', sans-serif;
-    background: #06152b;
-    color: white;
-}
+/* HIDE STREAMLIT */
 
-/* Hide Streamlit */
 #MainMenu {
-    visibility: hidden;
-}
-
-footer {
     visibility: hidden;
 }
 
@@ -56,19 +46,42 @@ header {
     visibility: hidden;
 }
 
-.stDeployButton {
-    display: none;
+footer {
+    visibility: hidden;
 }
 
-[data-testid="stStatusWidget"] {
-    display: none;
+[data-testid="stToolbar"] {
+    display: none !important;
 }
 
 [data-testid="stDecoration"] {
-    display: none;
+    display: none !important;
 }
 
-/* Main */
+[data-testid="stStatusWidget"] {
+    display: none !important;
+}
+
+[data-testid="collapsedControl"] {
+    display: none !important;
+}
+
+.stDeployButton {
+    display: none !important;
+}
+
+iframe {
+    display: none !important;
+}
+
+/* APP */
+
+html, body, [class*="css"] {
+    font-family: 'Poppins', sans-serif;
+    background: #06152b;
+    color: white;
+}
+
 .stApp {
     background: linear-gradient(
         135deg,
@@ -78,7 +91,8 @@ header {
     );
 }
 
-/* Title */
+/* TITLE */
+
 .main-title {
     text-align: center;
     font-size: 55px;
@@ -92,16 +106,19 @@ header {
     color: #d1d5db;
 }
 
-/* Cards */
+/* CARD */
+
 .card {
     background: rgba(255,255,255,0.05);
     padding: 20px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
 }
 
-/* Buttons */
-.stButton>button {
+/* BUTTON */
+
+.stButton > button {
     width: 100%;
     border-radius: 15px;
     padding: 14px;
@@ -112,13 +129,16 @@ header {
     background: linear-gradient(90deg,#2563eb,#9333ea);
 }
 
-/* Inputs */
+/* INPUT */
+
 .stTextInput input {
     background-color: #1e293b !important;
     color: white !important;
     border-radius: 14px !important;
     border: 1px solid #334155 !important;
 }
+
+/* TEXT AREA */
 
 .stTextArea textarea {
     background-color: #1e293b !important;
@@ -127,7 +147,8 @@ header {
     border: 1px solid #334155 !important;
 }
 
-/* File uploader */
+/* FILE */
+
 .stFileUploader {
     background-color: #1e293b;
     padding: 20px;
@@ -152,11 +173,14 @@ if st.session_state.logged_in == False:
         unsafe_allow_html=True
     )
 
-    tab1, tab2 = st.tabs(["📝 Create Account", "🔑 Login"])
+    menu = st.radio(
+        "",
+        ["📝 Create Account", "🔑 Login"]
+    )
 
-    # -------- CREATE ACCOUNT --------
+    # ---------------- CREATE ACCOUNT ----------------
 
-    with tab1:
+    if menu == "📝 Create Account":
 
         email = st.text_input("📧 Email")
 
@@ -168,15 +192,18 @@ if st.session_state.logged_in == False:
         if st.button("🚀 Create Account"):
 
             if email in st.session_state.users:
+
                 st.error("User already exists ❌")
 
             else:
+
                 st.session_state.users[email] = password
+
                 st.success("Account created successfully ✅")
 
-    # -------- LOGIN --------
+    # ---------------- LOGIN ----------------
 
-    with tab2:
+    if menu == "🔑 Login":
 
         login_email = st.text_input("📧 Login Email")
 
@@ -194,10 +221,13 @@ if st.session_state.logged_in == False:
             ):
 
                 st.session_state.logged_in = True
+
                 st.success("Login successful ✅")
+
                 st.rerun()
 
             else:
+
                 st.error("Invalid email or password ❌")
 
 # ---------------- DASHBOARD ----------------
@@ -207,7 +237,7 @@ else:
     st.sidebar.title("🚀 Dashboard")
 
     page = st.sidebar.radio(
-        "Go To",
+        "Navigation",
         [
             "🏠 Home",
             "📊 Resume Analyzer",
@@ -216,7 +246,9 @@ else:
     )
 
     if st.sidebar.button("🚪 Logout"):
+
         st.session_state.logged_in = False
+
         st.rerun()
 
     # ---------------- HOME ----------------
@@ -233,31 +265,26 @@ else:
             unsafe_allow_html=True
         )
 
-        col1, col2, col3 = st.columns(3)
+        st.markdown("""
+        <div class="card">
+        <h2>📄 Resume Checks</h2>
+        <h1>120+</h1>
+        </div>
+        """, unsafe_allow_html=True)
 
-        with col1:
-            st.markdown("""
-            <div class="card">
-            <h3>📄 Resume Checks</h3>
-            <h1>120+</h1>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+        <div class="card">
+        <h2>🤖 AI Accuracy</h2>
+        <h1>95%</h1>
+        </div>
+        """, unsafe_allow_html=True)
 
-        with col2:
-            st.markdown("""
-            <div class="card">
-            <h3>🤖 AI Accuracy</h3>
-            <h1>95%</h1>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with col3:
-            st.markdown("""
-            <div class="card">
-            <h3>🚀 ATS Success</h3>
-            <h1>90%</h1>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+        <div class="card">
+        <h2>🚀 ATS Success</h2>
+        <h1>90%</h1>
+        </div>
+        """, unsafe_allow_html=True)
 
     # ---------------- ANALYZER ----------------
 
@@ -278,19 +305,27 @@ else:
 
             resume = ""
 
-            # PDF TEXT
+            # PDF
+
             if uploaded_file:
 
                 pdf_reader = PdfReader(uploaded_file)
 
                 for page in pdf_reader.pages:
-                    resume += page.extract_text()
 
-            # TEXT AREA
+                    text = page.extract_text()
+
+                    if text:
+                        resume += text
+
+            # TEXT
+
             if resume_text:
+
                 resume += resume_text
 
             if resume == "":
+
                 st.error("Please upload or paste resume ❌")
 
             else:
@@ -308,23 +343,30 @@ else:
                 found_skills = []
 
                 for skill in skills:
+
                     if skill.lower() in resume.lower():
+
                         found_skills.append(skill)
 
                 missing_skills = [
+
                     s for s in skills
                     if s not in found_skills
+
                 ]
 
                 score = int(
                     (len(found_skills) / len(skills)) * 100
                 )
 
-                # ATS RESULTS
+                # RESULTS
 
                 st.subheader("📊 ATS Results")
 
-                st.metric("🚀 ATS Score", f"{score}%")
+                st.metric(
+                    "🚀 ATS Score",
+                    f"{score}%"
+                )
 
                 st.metric(
                     "✅ Skills Found",
@@ -359,7 +401,7 @@ else:
 
                 st.info(feedback)
 
-                # -------- GEMINI AI --------
+                # ---------------- AI ANALYSIS ----------------
 
                 try:
 
@@ -388,7 +430,7 @@ Give:
 
                         st.write(ai_text)
 
-                except Exception as e:
+                except Exception:
 
                     ai_text = """
 ✅ Add more technical skills
@@ -402,17 +444,19 @@ Give:
 
                     st.info(ai_text)
 
-                # -------- SAVE HISTORY --------
+                # ---------------- SAVE HISTORY ----------------
 
                 st.session_state.history.append({
 
                     "date": str(datetime.now())[:19],
+
                     "score": score,
+
                     "skills": found_skills
 
                 })
 
-                # -------- PDF REPORT --------
+                # ---------------- PDF REPORT ----------------
 
                 pdf = FPDF()
 
@@ -477,5 +521,4 @@ AI Feedback:
 <p>✅ Skills: {', '.join(item['skills'])}</p>
 
 </div>
-<br>
 """, unsafe_allow_html=True)
