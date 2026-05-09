@@ -245,10 +245,10 @@ menu = st.selectbox(
     ]
 )
 
-    if st.sidebar.button("🚪 Logout"):
-        st.session_state.user = None
-        st.session_state.page = "login"
-        st.rerun()
+    if st.button("🚪 Logout"):
+    st.session_state.user = None
+    st.session_state.page = "login"
+    st.rerun()
 
     # ---------- HOME ----------
 
