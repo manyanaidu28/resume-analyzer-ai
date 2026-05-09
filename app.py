@@ -86,7 +86,7 @@ h1, h2, h3 {
 /* Buttons */
 .stButton button {
     width: 100%;
-    border-radius: 14px;
+    border-radius: 16px;
     background: linear-gradient(
         90deg,
         #2563eb,
@@ -94,9 +94,14 @@ h1, h2, h3 {
     );
     color: white;
     font-weight: bold;
+    font-size: 18px;
     border: none;
-    padding: 14px;
+    padding: 16px;
     transition: 0.3s;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .stButton button:hover {
