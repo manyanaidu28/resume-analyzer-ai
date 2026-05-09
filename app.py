@@ -1,11 +1,9 @@
 import streamlit as st
-import json
-import os
-import pandas as pd
 import google.generativeai as genai
+from PyPDF2 import PdfReader
 from fpdf import FPDF
-import PyPDF2
 from datetime import datetime
+import os
 
 # ---------------- PAGE CONFIG ----------------
 
@@ -17,35 +15,101 @@ st.set_page_config(
 
 # ---------------- GEMINI API ----------------
 
-GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY"
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"
 
 genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# ---------------- PROFESSIONAL UI ----------------
+# ---------------- SESSION ----------------
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "users" not in st.session_state:
+    st.session_state.users = {}
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# ---------------- CSS ----------------
 
 st.markdown("""
 <style>
 
 html, body, [class*="css"] {
-    font-family: sans-serif;
+    font-family: 'Poppins', sans-serif;
+    background: #06152b;
+    color: white;
 }
 
 /* Hide Streamlit */
-#MainMenu {visibility:hidden;}
-footer {visibility:hidden;}
-header {visibility:hidden;}
+#MainMenu {
+    visibility: hidden;
+}
 
-/* Background */
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+.stDeployButton {
+    display: none;
+}
+
+[data-testid="stStatusWidget"] {
+    display: none;
+}
+
+[data-testid="stDecoration"] {
+    display: none;
+}
+
+/* Main */
 .stApp {
     background: linear-gradient(
         135deg,
         #020617,
-        #0f172a,
-        #111827
+        #071b34,
+        #020617
     );
+}
+
+/* Title */
+.main-title {
+    text-align: center;
+    font-size: 55px;
+    font-weight: bold;
     color: white;
+}
+
+.sub-text {
+    text-align: center;
+    font-size: 24px;
+    color: #d1d5db;
+}
+
+/* Cards */
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Buttons */
+.stButton>button {
+    width: 100%;
+    border-radius: 15px;
+    padding: 14px;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(90deg,#2563eb,#9333ea);
 }
 
 /* Inputs */
@@ -63,283 +127,211 @@ header {visibility:hidden;}
     border: 1px solid #334155 !important;
 }
 
-/* Buttons */
-.stButton button {
-    width: 100%;
-    border-radius: 16px;
-    background: linear-gradient(
-        90deg,
-        #2563eb,
-        #7c3aed
-    );
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    padding: 16px;
-}
-
-/* Metrics */
-[data-testid="metric-container"] {
+/* File uploader */
+.stFileUploader {
     background-color: #1e293b;
+    padding: 20px;
     border-radius: 16px;
-    padding: 15px;
     border: 1px solid #334155;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- DATABASE ----------------
-
-if not os.path.exists("users.json"):
-    with open("users.json", "w") as f:
-        json.dump({}, f)
-
-with open("users.json", "r") as f:
-    users = json.load(f)
-
-# ---------------- SESSION ----------------
-
-if "user" not in st.session_state:
-    st.session_state.user = None
-
-if "page" not in st.session_state:
-    st.session_state.page = "signup"
-
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-# ---------------- SIGNUP PAGE ----------------
-
-if st.session_state.page == "signup":
-
-    st.markdown("""
-    <h1 style='text-align:center;'>
-    📝 Create Account
-    </h1>
-    """, unsafe_allow_html=True)
-
-    email = st.text_input("📧 Email")
-
-    password = st.text_input(
-        "🔒 Password",
-        type="password"
-    )
-
-    if st.button("🚀 Create Account"):
-
-        if email in users:
-
-            st.error("User already exists ❌")
-
-        elif email == "" or password == "":
-
-            st.warning("Fill all fields ⚠️")
-
-        else:
-
-            users[email] = password
-
-            with open("users.json", "w") as f:
-                json.dump(users, f)
-
-            st.success(
-                "Account created successfully ✅"
-            )
-
-    if st.button("🔑 Already have account? Login"):
-
-        st.session_state.page = "login"
-
-        st.rerun()
-
 # ---------------- LOGIN PAGE ----------------
 
-elif st.session_state.page == "login":
+if st.session_state.logged_in == False:
 
-    st.markdown("""
-    <h1 style='text-align:center;'>
-    🔐 Login
-    </h1>
-    """, unsafe_allow_html=True)
-
-    email = st.text_input("📧 Email")
-
-    password = st.text_input(
-        "🔒 Password",
-        type="password"
+    st.markdown(
+        "<h1 class='main-title'>🚀 Resume Analyzer AI</h1>",
+        unsafe_allow_html=True
     )
 
-    if st.button("🚀 Login"):
+    st.markdown(
+        "<p class='sub-text'>Analyze your resume using AI & improve your career 🔥</p>",
+        unsafe_allow_html=True
+    )
 
-        if email in users and users[email] == password:
+    tab1, tab2 = st.tabs(["📝 Create Account", "🔑 Login"])
 
-            st.session_state.user = email
+    # -------- CREATE ACCOUNT --------
 
-            st.session_state.page = "dashboard"
+    with tab1:
 
-            st.rerun()
+        email = st.text_input("📧 Email")
 
-        else:
+        password = st.text_input(
+            "🔒 Password",
+            type="password"
+        )
 
-            st.error("Invalid credentials ❌")
+        if st.button("🚀 Create Account"):
 
-    if st.button("📝 Create New Account"):
+            if email in st.session_state.users:
+                st.error("User already exists ❌")
 
-        st.session_state.page = "signup"
+            else:
+                st.session_state.users[email] = password
+                st.success("Account created successfully ✅")
 
-        st.rerun()
+    # -------- LOGIN --------
+
+    with tab2:
+
+        login_email = st.text_input("📧 Login Email")
+
+        login_password = st.text_input(
+            "🔒 Login Password",
+            type="password"
+        )
+
+        if st.button("🔑 Login"):
+
+            if (
+                login_email in st.session_state.users
+                and
+                st.session_state.users[login_email] == login_password
+            ):
+
+                st.session_state.logged_in = True
+                st.success("Login successful ✅")
+                st.rerun()
+
+            else:
+                st.error("Invalid email or password ❌")
 
 # ---------------- DASHBOARD ----------------
 
-elif st.session_state.page == "dashboard":
+else:
 
-    st.title("🚀 Resume Analyzer AI")
+    st.sidebar.title("🚀 Dashboard")
 
-    st.markdown("""
-    ### Analyze your resume using AI & improve your career 🔥
-    """)
-
-    menu = st.selectbox(
-        "📱 Navigation",
+    page = st.sidebar.radio(
+        "Go To",
         [
-            "🏠 Dashboard",
-            "📄 Resume Analyzer",
-            "📊 Analytics",
-            "💼 Job Recommendations",
-            "👤 Profile"
+            "🏠 Home",
+            "📊 Resume Analyzer",
+            "📜 History"
         ]
     )
 
-    if st.button("🚪 Logout"):
-
-        st.session_state.user = None
-
-        st.session_state.page = "login"
-
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.logged_in = False
         st.rerun()
 
     # ---------------- HOME ----------------
 
-    if menu == "🏠 Dashboard":
+    if page == "🏠 Home":
+
+        st.markdown(
+            "<h1 class='main-title'>🚀 Resume Analyzer AI</h1>",
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            "<p class='sub-text'>Analyze your resume using AI & improve your career 🔥</p>",
+            unsafe_allow_html=True
+        )
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.metric("📄 Resume Checks", "120+")
+            st.markdown("""
+            <div class="card">
+            <h3>📄 Resume Checks</h3>
+            <h1>120+</h1>
+            </div>
+            """, unsafe_allow_html=True)
 
         with col2:
-            st.metric("🤖 AI Accuracy", "95%")
+            st.markdown("""
+            <div class="card">
+            <h3>🤖 AI Accuracy</h3>
+            <h1>95%</h1>
+            </div>
+            """, unsafe_allow_html=True)
 
         with col3:
-            st.metric("🚀 ATS Success", "90%")
+            st.markdown("""
+            <div class="card">
+            <h3>🚀 ATS Success</h3>
+            <h1>90%</h1>
+            </div>
+            """, unsafe_allow_html=True)
 
-        st.success(
-            f"Welcome {st.session_state.user} 🚀"
-        )
+    # ---------------- ANALYZER ----------------
 
-    # ---------------- RESUME ANALYZER ----------------
+    elif page == "📊 Resume Analyzer":
 
-    elif menu == "📄 Resume Analyzer":
-
-        st.subheader("📄 Upload Resume")
-
-        skills = [
-            "python",
-            "sql",
-            "machine learning",
-            "excel",
-            "communication",
-            "data analysis",
-            "deep learning",
-            "nlp",
-            "power bi",
-            "tableau",
-            "react",
-            "java",
-            "c++",
-            "aws",
-            "cloud",
-            "javascript"
-        ]
+        st.title("📊 Resume Analyzer")
 
         uploaded_file = st.file_uploader(
-            "📄 Upload Resume",
-            type=["pdf", "txt"]
+            "📄 Upload Resume PDF",
+            type=["pdf"]
         )
 
-        resume = ""
-
-        if uploaded_file is not None:
-
-            if uploaded_file.type == "application/pdf":
-
-                pdf_reader = PyPDF2.PdfReader(
-                    uploaded_file
-                )
-
-                for page in pdf_reader.pages:
-
-                    text = page.extract_text()
-
-                    if text:
-                        resume += text
-
-            else:
-
-                resume = uploaded_file.read().decode(
-                    "utf-8"
-                )
-
-        resume_input = st.text_area(
+        resume_text = st.text_area(
             "📋 Or paste your resume here"
         )
 
-        if resume_input:
-            resume = resume_input
-
         if st.button("🔍 Analyze Resume"):
 
-            if resume.strip() == "":
+            resume = ""
 
-                st.warning(
-                    "Please upload or paste resume ⚠️"
-                )
+            # PDF TEXT
+            if uploaded_file:
+
+                pdf_reader = PdfReader(uploaded_file)
+
+                for page in pdf_reader.pages:
+                    resume += page.extract_text()
+
+            # TEXT AREA
+            if resume_text:
+                resume += resume_text
+
+            if resume == "":
+                st.error("Please upload or paste resume ❌")
 
             else:
 
-                resume = resume.lower()
-
-                found_skills = [
-                    s for s in skills if s in resume
+                skills = [
+                    "python",
+                    "sql",
+                    "machine learning",
+                    "deep learning",
+                    "data analysis",
+                    "excel",
+                    "communication"
                 ]
 
+                found_skills = []
+
+                for skill in skills:
+                    if skill.lower() in resume.lower():
+                        found_skills.append(skill)
+
                 missing_skills = [
-                    s for s in skills if s not in resume
+                    s for s in skills
+                    if s not in found_skills
                 ]
 
                 score = int(
                     (len(found_skills) / len(skills)) * 100
                 )
 
+                # ATS RESULTS
+
                 st.subheader("📊 ATS Results")
 
-                col1, col2 = st.columns(2)
+                st.metric("🚀 ATS Score", f"{score}%")
 
-                with col1:
-                    st.metric(
-                        "🚀 ATS Score",
-                        f"{score}%"
-                    )
+                st.metric(
+                    "✅ Skills Found",
+                    len(found_skills)
+                )
 
-                with col2:
-                    st.metric(
-                        "✅ Skills Found",
-                        len(found_skills)
-                    )
-
-                st.progress(score)
+                st.progress(score / 100)
 
                 st.success(
                     f"✅ Found Skills: {', '.join(found_skills)}"
@@ -367,49 +359,50 @@ elif st.session_state.page == "dashboard":
 
                 st.info(feedback)
 
-                # ---------------- GEMINI AI ----------------
+                # -------- GEMINI AI --------
 
-    try:
+                try:
 
-    with st.spinner("🤖 Gemini AI analyzing..."):
+                    with st.spinner("🤖 Gemini AI analyzing..."):
 
-        response = model.generate_content(
-            f"""
-            Analyze this resume professionally.
+                        response = model.generate_content(
+                            f"""
+Analyze this resume professionally.
 
-            Resume:
-            {resume}
+Resume:
+{resume}
 
-            Give:
-            1. ATS improvement tips
-            2. Missing skills
-            3. Career suggestions
-            4. Resume strengths
-            5. Weaknesses
-            6. Interview preparation tips
-            """
-        )
+Give:
+1. ATS improvement tips
+2. Missing skills
+3. Career suggestions
+4. Resume strengths
+5. Weaknesses
+6. Interview preparation tips
+"""
+                        )
 
-        ai_text = response.text
+                        ai_text = response.text
 
-        st.subheader("🤖 AI Analysis")
+                        st.subheader("🤖 AI Analysis")
 
-        st.write(ai_text)
+                        st.write(ai_text)
 
-except Exception as e:
+                except Exception as e:
 
-    ai_text = """
-    ✅ Add more technical skills
-    ✅ Add projects
-    ✅ Add certifications
-    ✅ Improve resume formatting
-    ✅ Add internships
-    """
+                    ai_text = """
+✅ Add more technical skills
+✅ Add projects
+✅ Add certifications
+✅ Improve resume formatting
+✅ Add internships
+"""
 
-    st.subheader("🤖 AI Analysis")
+                    st.subheader("🤖 AI Analysis")
 
-    st.info(ai_text)
-                # ---------------- SAVE HISTORY ----------------
+                    st.info(ai_text)
+
+                # -------- SAVE HISTORY --------
 
                 st.session_state.history.append({
 
@@ -419,7 +412,7 @@ except Exception as e:
 
                 })
 
-                # ---------------- PDF REPORT ----------------
+                # -------- PDF REPORT --------
 
                 pdf = FPDF()
 
@@ -443,76 +436,46 @@ Missing Skills:
 {', '.join(missing_skills[:5])}
 
 AI Feedback:
-{response.text}
+{ai_text}
 """
                 )
 
-                pdf.output("report.pdf")
+                pdf.output("resume_report.pdf")
 
                 with open(
-                    "report.pdf",
+                    "resume_report.pdf",
                     "rb"
                 ) as file:
 
                     st.download_button(
-                        "📥 Download PDF Report",
+                        "📥 Download Report",
                         file,
                         file_name="resume_report.pdf"
                     )
 
-    # ---------------- ANALYTICS ----------------
+    # ---------------- HISTORY ----------------
 
-    elif menu == "📊 Analytics":
+    elif page == "📜 History":
 
-        st.subheader("📈 Analytics")
+        st.title("📜 Resume History")
 
         if len(st.session_state.history) == 0:
 
-            st.warning("No history available")
+            st.info("No history available")
 
         else:
 
-            df = pd.DataFrame(
-                st.session_state.history
-            )
+            for item in st.session_state.history:
 
-            st.dataframe(df)
+                st.markdown(f"""
+<div class="card">
 
-            st.line_chart(df["score"])
+<h3>📅 {item['date']}</h3>
 
-    # ---------------- JOB RECOMMENDATIONS ----------------
+<h2>🚀 Score: {item['score']}%</h2>
 
-    elif menu == "💼 Job Recommendations":
+<p>✅ Skills: {', '.join(item['skills'])}</p>
 
-        st.subheader("💼 AI Job Recommendations")
-
-        st.info("""
-🔥 Recommended Roles:
-
-• Python Developer  
-• Data Analyst  
-• Machine Learning Engineer  
-• Frontend Developer  
-• AI Engineer  
-• Cloud Engineer  
-""")
-
-    # ---------------- PROFILE ----------------
-
-    elif menu == "👤 Profile":
-
-        st.subheader("👤 Profile")
-
-        st.success(
-            f"Logged in as: {st.session_state.user}"
-        )
-
-        st.info("""
-🚀 Premium Features Coming Soon:
-
-• AI Mock Interviews  
-• Resume Templates  
-• Cover Letter Generator  
-• LinkedIn Optimizer  
-• Admin Dashboard  
-""")
+</div>
+<br>
+""", unsafe_allow_html=True)
