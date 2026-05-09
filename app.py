@@ -229,44 +229,16 @@ elif st.session_state.page == "dashboard":
     <h1 class='main-title'>🚀 Dashboard</h1>
     """, unsafe_allow_html=True)
 
+    st.write("")
+
+    # ONLY MAIN BUTTONS
+
     if st.button("🏠 Home"):
         st.session_state.page = "home"
         st.rerun()
 
     if st.button("📄 Upload Resume"):
         st.session_state.page = "upload"
-        st.rerun()
-
-    if st.button("⚡ Resume Processing"):
-        st.session_state.page = "processing"
-        st.rerun()
-
-    if st.button("📊 ATS Results"):
-        st.session_state.page = "ats"
-        st.rerun()
-
-    if st.button("🧠 Skills Analysis"):
-        st.session_state.page = "skills"
-        st.rerun()
-
-    if st.button("❌ Missing Skills"):
-        st.session_state.page = "missing"
-        st.rerun()
-
-    if st.button("💡 AI Suggestions"):
-        st.session_state.page = "suggestions"
-        st.rerun()
-
-    if st.button("💼 Career Recommendations"):
-        st.session_state.page = "career"
-        st.rerun()
-
-    if st.button("📜 Resume Tips"):
-        st.session_state.page = "tips"
-        st.rerun()
-
-    if st.button("📥 Download PDF Report"):
-        st.session_state.page = "download"
         st.rerun()
 
     if st.button("🕘 Resume History"):
@@ -282,21 +254,6 @@ elif st.session_state.page == "dashboard":
         st.session_state.page = "welcome"
         st.rerun()
 
-# ---------------- HOME PAGE ----------------
-
-elif st.session_state.page == "home":
-
-    st.title("🏠 Home")
-
-    st.markdown("""
-    <div class='card'>
-    Welcome to your AI Resume Dashboard 🔥
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
-        st.rerun()
 
 # ---------------- UPLOAD PAGE ----------------
 
@@ -310,29 +267,48 @@ elif st.session_state.page == "upload":
     )
 
     if uploaded_file:
+
         st.success("Resume Uploaded Successfully ✅")
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+        time.sleep(1)
+
+        # AUTO GO TO PROCESSING
+        st.session_state.page = "processing"
+
         st.rerun()
+
+    if st.button("⬅ Back to Dashboard"):
+
+        st.session_state.page = "dashboard"
+
+        st.rerun()
+
 
 # ---------------- PROCESSING PAGE ----------------
 
 elif st.session_state.page == "processing":
 
-    st.title("⚡ Resume Processing")
+    st.title("⚡ AI Resume Analysis")
+
+    st.info("📄 Reading Resume...")
 
     progress = st.progress(0)
 
     for i in range(100):
-        time.sleep(0.02)
+
+        time.sleep(0.03)
+
         progress.progress(i + 1)
 
     st.success("AI Analysis Completed ✅")
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
-        st.rerun()
+    time.sleep(1)
+
+    # AUTO GO TO ATS PAGE
+    st.session_state.page = "ats"
+
+    st.rerun()
+
 
 # ---------------- ATS PAGE ----------------
 
@@ -342,9 +318,16 @@ elif st.session_state.page == "ats":
 
     st.metric("ATS Score", "92%")
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+    st.progress(92)
+
+    st.success("Resume is ATS Optimized ✅")
+
+    if st.button("Next →"):
+
+        st.session_state.page = "skills"
+
         st.rerun()
+
 
 # ---------------- SKILLS PAGE ----------------
 
@@ -364,9 +347,12 @@ elif st.session_state.page == "skills":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+    if st.button("Next →"):
+
+        st.session_state.page = "missing"
+
         st.rerun()
+
 
 # ---------------- MISSING SKILLS PAGE ----------------
 
@@ -384,9 +370,12 @@ elif st.session_state.page == "missing":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+    if st.button("Next →"):
+
+        st.session_state.page = "suggestions"
+
         st.rerun()
+
 
 # ---------------- SUGGESTIONS PAGE ----------------
 
@@ -406,9 +395,12 @@ elif st.session_state.page == "suggestions":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+    if st.button("Next →"):
+
+        st.session_state.page = "career"
+
         st.rerun()
+
 
 # ---------------- CAREER PAGE ----------------
 
@@ -427,9 +419,12 @@ elif st.session_state.page == "career":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+    if st.button("Next →"):
+
+        st.session_state.page = "tips"
+
         st.rerun()
+
 
 # ---------------- TIPS PAGE ----------------
 
@@ -448,8 +443,10 @@ elif st.session_state.page == "tips":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("⬅ Back to Dashboard"):
-        st.session_state.page = "dashboard"
+    if st.button("Next →"):
+
+        st.session_state.page = "download"
+
         st.rerun()
 
 # ---------------- DOWNLOAD PAGE ----------------
