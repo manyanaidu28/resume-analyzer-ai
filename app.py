@@ -16,16 +16,12 @@ st.set_page_config(
 )
 
 # ---------------- GEMINI API ----------------
-# GET API KEY:
-# https://aistudio.google.com/app/apikey
 
-GEMINI_API_KEY = "AIzaSyCLjJNL1dT256Wf_d1gfiVQrlMusaaTb-A"
+GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY"
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-model = genai.GenerativeModel(
-    "gemini-1.5-flash"
-)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 # ---------------- PROFESSIONAL UI ----------------
 
@@ -33,9 +29,7 @@ st.markdown("""
 <style>
 
 html, body, [class*="css"] {
-    font-family: 'Poppins', sans-serif;
-    background-color: #0f172a;
-    color: white;
+    font-family: sans-serif;
 }
 
 /* Hide Streamlit */
@@ -43,7 +37,7 @@ html, body, [class*="css"] {
 footer {visibility:hidden;}
 header {visibility:hidden;}
 
-/* Main App */
+/* Background */
 .stApp {
     background: linear-gradient(
         135deg,
@@ -51,11 +45,7 @@ header {visibility:hidden;}
         #0f172a,
         #111827
     );
-}
-
-/* Titles */
-h1, h2, h3 {
-    color: white !important;
+    color: white;
 }
 
 /* Inputs */
@@ -64,23 +54,13 @@ h1, h2, h3 {
     color: white !important;
     border-radius: 14px !important;
     border: 1px solid #334155 !important;
-    padding: 12px !important;
 }
 
-/* Text area */
 .stTextArea textarea {
     background-color: #1e293b !important;
     color: white !important;
     border-radius: 14px !important;
     border: 1px solid #334155 !important;
-}
-
-/* File uploader */
-.stFileUploader {
-    background-color: #1e293b;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #334155;
 }
 
 /* Buttons */
@@ -93,42 +73,18 @@ h1, h2, h3 {
         #7c3aed
     );
     color: white;
-    font-weight: bold;
     font-size: 18px;
+    font-weight: bold;
     border: none;
     padding: 16px;
-    transition: 0.3s;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.stButton button:hover {
-    transform: scale(1.02);
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background-color: #111827;
-}
-
-/* Metric Cards */
+/* Metrics */
 [data-testid="metric-container"] {
     background-color: #1e293b;
     border-radius: 16px;
     padding: 15px;
     border: 1px solid #334155;
-}
-
-/* Success */
-.stSuccess {
-    border-radius: 12px;
-}
-
-/* Warning */
-.stWarning {
-    border-radius: 12px;
 }
 
 </style>
@@ -164,29 +120,38 @@ if st.session_state.page == "signup":
     </h1>
     """, unsafe_allow_html=True)
 
-    st.write("")
-
     email = st.text_input("📧 Email")
-    password = st.text_input("🔒 Password", type="password")
+
+    password = st.text_input(
+        "🔒 Password",
+        type="password"
+    )
 
     if st.button("🚀 Create Account"):
 
         if email in users:
+
             st.error("User already exists ❌")
 
         elif email == "" or password == "":
+
             st.warning("Fill all fields ⚠️")
 
         else:
+
             users[email] = password
 
             with open("users.json", "w") as f:
                 json.dump(users, f)
 
-            st.success("Account created successfully ✅")
+            st.success(
+                "Account created successfully ✅"
+            )
 
-    if st.button("🔑 Already have an account? Login"):
+    if st.button("🔑 Already have account? Login"):
+
         st.session_state.page = "login"
+
         st.rerun()
 
 # ---------------- LOGIN PAGE ----------------
@@ -199,74 +164,65 @@ elif st.session_state.page == "login":
     </h1>
     """, unsafe_allow_html=True)
 
-    st.write("")
-
     email = st.text_input("📧 Email")
-    password = st.text_input("🔒 Password", type="password")
+
+    password = st.text_input(
+        "🔒 Password",
+        type="password"
+    )
 
     if st.button("🚀 Login"):
 
         if email in users and users[email] == password:
 
             st.session_state.user = email
-            st.session_state.page = "dashboard"
 
-            st.success("Login successful ✅")
+            st.session_state.page = "dashboard"
 
             st.rerun()
 
         else:
+
             st.error("Invalid credentials ❌")
 
     if st.button("📝 Create New Account"):
+
         st.session_state.page = "signup"
+
         st.rerun()
 
 # ---------------- DASHBOARD ----------------
 
 elif st.session_state.page == "dashboard":
 
-    # ---------- SIDEBAR ----------
+    st.title("🚀 Resume Analyzer AI")
 
-    st.sidebar.title("🚀 Resume Analyzer")
+    st.markdown("""
+    ### Analyze your resume using AI & improve your career 🔥
+    """)
 
-    st.sidebar.success(f"Logged in as:\n{st.session_state.user}")
-
-    st.markdown("## 📱 Navigation")
-
-menu = st.selectbox(
-    "Choose Section",
-    [
-        "🏠 Dashboard",
-        "📄 Resume Analyzer",
-        "📊 Analytics",
-        "💼 Job Recommendations",
-        "⚙️ Profile"
-    ]
-)
+    menu = st.selectbox(
+        "📱 Navigation",
+        [
+            "🏠 Dashboard",
+            "📄 Resume Analyzer",
+            "📊 Analytics",
+            "💼 Job Recommendations",
+            "👤 Profile"
+        ]
+    )
 
     if st.button("🚪 Logout"):
-    st.session_state.user = None
-    st.session_state.page = "login"
-    st.rerun()
 
-    # ---------- HOME ----------
+        st.session_state.user = None
+
+        st.session_state.page = "login"
+
+        st.rerun()
+
+    # ---------------- HOME ----------------
 
     if menu == "🏠 Dashboard":
-
-        st.markdown("""
-        <h1 style='text-align:center;'>
-        🚀 Resume Analyzer AI
-        </h1>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <h4 style='text-align:center; color:lightgray;'>
-        Analyze your resume using AI & improve your career 🔥
-        </h4>
-        """, unsafe_allow_html=True)
-
-        st.write("")
 
         col1, col2, col3 = st.columns(3)
 
@@ -279,14 +235,15 @@ menu = st.selectbox(
         with col3:
             st.metric("🚀 ATS Success", "90%")
 
-        st.write("")
-        st.info("Use the sidebar to access all features 🚀")
+        st.success(
+            f"Welcome {st.session_state.user} 🚀"
+        )
 
-    # ---------- RESUME ANALYZER ----------
+    # ---------------- RESUME ANALYZER ----------------
 
     elif menu == "📄 Resume Analyzer":
 
-        st.title("📄 Resume Analyzer")
+        st.subheader("📄 Upload Resume")
 
         skills = [
             "python",
@@ -308,19 +265,19 @@ menu = st.selectbox(
         ]
 
         uploaded_file = st.file_uploader(
-            "📄 Upload Resume (PDF/TXT)",
+            "📄 Upload Resume",
             type=["pdf", "txt"]
         )
 
         resume = ""
 
-        # ---------- READ PDF ----------
-
         if uploaded_file is not None:
 
             if uploaded_file.type == "application/pdf":
 
-                pdf_reader = PyPDF2.PdfReader(uploaded_file)
+                pdf_reader = PyPDF2.PdfReader(
+                    uploaded_file
+                )
 
                 for page in pdf_reader.pages:
 
@@ -330,9 +287,10 @@ menu = st.selectbox(
                         resume += text
 
             else:
-                resume = uploaded_file.read().decode("utf-8")
 
-        # ---------- TEXT AREA ----------
+                resume = uploaded_file.read().decode(
+                    "utf-8"
+                )
 
         resume_input = st.text_area(
             "📋 Or paste your resume here"
@@ -341,12 +299,13 @@ menu = st.selectbox(
         if resume_input:
             resume = resume_input
 
-        # ---------- ANALYZE ----------
-
         if st.button("🔍 Analyze Resume"):
 
             if resume.strip() == "":
-                st.warning("Please upload or paste resume ⚠️")
+
+                st.warning(
+                    "Please upload or paste resume ⚠️"
+                )
 
             else:
 
@@ -364,14 +323,15 @@ menu = st.selectbox(
                     (len(found_skills) / len(skills)) * 100
                 )
 
-                # ---------- RESULTS ----------
-
                 st.subheader("📊 ATS Results")
 
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    st.metric("🚀 ATS Score", f"{score}%")
+                    st.metric(
+                        "🚀 ATS Score",
+                        f"{score}%"
+                    )
 
                 with col2:
                     st.metric(
@@ -386,10 +346,8 @@ menu = st.selectbox(
                 )
 
                 st.error(
-                    f"❌ Missing Skills: {', '.join(missing_skills[:6])}"
+                    f"❌ Missing Skills: {', '.join(missing_skills[:5])}"
                 )
-
-                # ---------- FEEDBACK ----------
 
                 feedback = f"""
 🔥 Resume Feedback
@@ -400,7 +358,7 @@ menu = st.selectbox(
 ❌ Missing Skills:
 {', '.join(missing_skills[:5])}
 
-🚀 Improve by adding:
+🚀 Add:
 - Projects
 - Certifications
 - Internships
@@ -409,32 +367,34 @@ menu = st.selectbox(
 
                 st.info(feedback)
 
-                # ---------- GEMINI AI ----------
+                # ---------------- GEMINI AI ----------------
 
-                with st.spinner("🤖 Gemini AI analyzing..."):
+                with st.spinner(
+                    "🤖 Gemini AI analyzing..."
+                ):
 
                     response = model.generate_content(
                         f"""
-                        Analyze this resume professionally.
+Analyze this resume professionally.
 
-                        Resume:
-                        {resume}
+Resume:
+{resume}
 
-                        Give:
-                        1. ATS improvement tips
-                        2. Missing skills
-                        3. Career suggestions
-                        4. Resume strengths
-                        5. Weaknesses
-                        6. Interview preparation tips
-                        """
+Give:
+1. ATS improvement tips
+2. Missing skills
+3. Career suggestions
+4. Resume strengths
+5. Weaknesses
+6. Interview preparation tips
+"""
                     )
 
                 st.subheader("🤖 AI Analysis")
 
                 st.write(response.text)
 
-                # ---------- SAVE HISTORY ----------
+                # ---------------- SAVE HISTORY ----------------
 
                 st.session_state.history.append({
 
@@ -444,19 +404,15 @@ menu = st.selectbox(
 
                 })
 
-                # ---------- PDF REPORT ----------
+                # ---------------- PDF REPORT ----------------
 
                 pdf = FPDF()
 
                 pdf.add_page()
 
-                pdf.set_font("Arial", size=12)
-
-                pdf.cell(
-                    200,
-                    10,
-                    txt="Resume Analyzer Report",
-                    ln=True
+                pdf.set_font(
+                    "Arial",
+                    size=12
                 )
 
                 pdf.multi_cell(
@@ -478,20 +434,22 @@ AI Feedback:
 
                 pdf.output("report.pdf")
 
-                with open("report.pdf", "rb") as file:
+                with open(
+                    "report.pdf",
+                    "rb"
+                ) as file:
 
                     st.download_button(
-                        label="📥 Download PDF Report",
-                        data=file,
-                        file_name="resume_report.pdf",
-                        mime="application/pdf"
+                        "📥 Download PDF Report",
+                        file,
+                        file_name="resume_report.pdf"
                     )
 
-    # ---------- ANALYTICS ----------
+    # ---------------- ANALYTICS ----------------
 
     elif menu == "📊 Analytics":
 
-        st.title("📊 Analytics Dashboard")
+        st.subheader("📈 Analytics")
 
         if len(st.session_state.history) == 0:
 
@@ -505,32 +463,30 @@ AI Feedback:
 
             st.dataframe(df)
 
-            st.subheader("📈 ATS Scores")
-
             st.line_chart(df["score"])
 
-    # ---------- JOB RECOMMENDATION ----------
+    # ---------------- JOB RECOMMENDATIONS ----------------
 
     elif menu == "💼 Job Recommendations":
 
-        st.title("💼 AI Job Recommendations")
+        st.subheader("💼 AI Job Recommendations")
 
         st.info("""
-🔥 Based on your skills you can target:
+🔥 Recommended Roles:
 
-• Python Developer
-• Data Analyst
-• Machine Learning Engineer
-• Frontend Developer
-• Cloud Engineer
-• AI Engineer
+• Python Developer  
+• Data Analyst  
+• Machine Learning Engineer  
+• Frontend Developer  
+• AI Engineer  
+• Cloud Engineer  
 """)
 
-    # ---------- PROFILE ----------
+    # ---------------- PROFILE ----------------
 
-    elif menu == "⚙️ Profile":
+    elif menu == "👤 Profile":
 
-        st.title("⚙️ User Profile")
+        st.subheader("👤 Profile")
 
         st.success(
             f"Logged in as: {st.session_state.user}"
@@ -538,9 +494,10 @@ AI Feedback:
 
         st.info("""
 🚀 Premium Features Coming Soon:
-- AI Mock Interviews
-- Resume Templates
-- LinkedIn Optimizer
-- Cover Letter Generator
-- Admin Dashboard
+
+• AI Mock Interviews  
+• Resume Templates  
+• Cover Letter Generator  
+• LinkedIn Optimizer  
+• Admin Dashboard  
 """)
