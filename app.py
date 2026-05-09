@@ -36,124 +36,58 @@ if "history" not in st.session_state:
 st.markdown("""
 <style>
 
-/* HIDE STREAMLIT */
+/* REMOVE STREAMLIT FOOTER COMPLETELY */
+
+footer {
+    visibility: hidden !important;
+    display: none !important;
+}
+
+footer:after {
+    content:'';
+    display:none !important;
+}
+
+[data-testid="stFooter"] {
+    display: none !important;
+}
+
+.viewerBadge_container__1QSob {
+    display: none !important;
+}
+
+.viewerBadge_link__1S137 {
+    display: none !important;
+}
+
+.viewerBadge_text__1JaDK {
+    display: none !important;
+}
 
 #MainMenu {
-    visibility: hidden;
+    visibility: hidden !important;
 }
 
 header {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-[data-testid="stToolbar"] {
-    display: none !important;
-}
-
-[data-testid="stDecoration"] {
-    display: none !important;
-}
-
-[data-testid="stStatusWidget"] {
-    display: none !important;
-}
-
-[data-testid="collapsedControl"] {
-    display: none !important;
+    visibility: hidden !important;
 }
 
 .stDeployButton {
     display: none !important;
 }
 
-iframe {
+/* MOBILE FIX */
+
+div[class*="viewerBadge"] {
     display: none !important;
 }
 
-/* APP */
-
-html, body, [class*="css"] {
-    font-family: 'Poppins', sans-serif;
-    background: #06152b;
-    color: white;
+div[class*="embeddedAppMetaInfoBar_container"] {
+    display: none !important;
 }
 
-.stApp {
-    background: linear-gradient(
-        135deg,
-        #020617,
-        #071b34,
-        #020617
-    );
-}
-
-/* TITLE */
-
-.main-title {
-    text-align: center;
-    font-size: 55px;
-    font-weight: bold;
-    color: white;
-}
-
-.sub-text {
-    text-align: center;
-    font-size: 24px;
-    color: #d1d5db;
-}
-
-/* CARD */
-
-.card {
-    background: rgba(255,255,255,0.05);
-    padding: 20px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 20px;
-}
-
-/* BUTTON */
-
-.stButton > button {
-    width: 100%;
-    border-radius: 15px;
-    padding: 14px;
-    border: none;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(90deg,#2563eb,#9333ea);
-}
-
-/* INPUT */
-
-.stTextInput input {
-    background-color: #1e293b !important;
-    color: white !important;
-    border-radius: 14px !important;
-    border: 1px solid #334155 !important;
-}
-
-/* TEXT AREA */
-
-.stTextArea textarea {
-    background-color: #1e293b !important;
-    color: white !important;
-    border-radius: 14px !important;
-    border: 1px solid #334155 !important;
-}
-
-/* FILE */
-
-.stFileUploader {
-    background-color: #1e293b;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #334155;
+div[class*="reportview-container"] footer {
+    display: none !important;
 }
 
 </style>
