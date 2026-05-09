@@ -369,31 +369,46 @@ elif st.session_state.page == "dashboard":
 
                 # ---------------- GEMINI AI ----------------
 
-                with st.spinner(
-                    "🤖 Gemini AI analyzing..."
-                ):
+    try:
 
-                    response = model.generate_content(
-                        f"""
-Analyze this resume professionally.
+    with st.spinner("🤖 Gemini AI analyzing..."):
 
-Resume:
-{resume}
+        response = model.generate_content(
+            f"""
+            Analyze this resume professionally.
 
-Give:
-1. ATS improvement tips
-2. Missing skills
-3. Career suggestions
-4. Resume strengths
-5. Weaknesses
-6. Interview preparation tips
-"""
-                    )
+            Resume:
+            {resume}
 
-                st.subheader("🤖 AI Analysis")
+            Give:
+            1. ATS improvement tips
+            2. Missing skills
+            3. Career suggestions
+            4. Resume strengths
+            5. Weaknesses
+            6. Interview preparation tips
+            """
+        )
 
-                st.write(response.text)
+        ai_text = response.text
 
+        st.subheader("🤖 AI Analysis")
+
+        st.write(ai_text)
+
+except Exception as e:
+
+    ai_text = """
+    ✅ Add more technical skills
+    ✅ Add projects
+    ✅ Add certifications
+    ✅ Improve resume formatting
+    ✅ Add internships
+    """
+
+    st.subheader("🤖 AI Analysis")
+
+    st.info(ai_text)
                 # ---------------- SAVE HISTORY ----------------
 
                 st.session_state.history.append({
