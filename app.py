@@ -232,16 +232,18 @@ elif st.session_state.page == "dashboard":
 
     st.sidebar.success(f"Logged in as:\n{st.session_state.user}")
 
-    menu = st.sidebar.radio(
-        "Navigation",
-        [
-            "🏠 Dashboard",
-            "📄 Resume Analyzer",
-            "📊 Analytics",
-            "💼 Job Recommendations",
-            "⚙️ Profile"
-        ]
-    )
+    st.markdown("## 📱 Navigation")
+
+menu = st.selectbox(
+    "Choose Section",
+    [
+        "🏠 Dashboard",
+        "📄 Resume Analyzer",
+        "📊 Analytics",
+        "💼 Job Recommendations",
+        "⚙️ Profile"
+    ]
+)
 
     if st.sidebar.button("🚪 Logout"):
         st.session_state.user = None
